@@ -32,6 +32,8 @@ async function run() {
 		packageJustificationMdFileText = '# Package Justification\n\n| Package | Kind | Justification | Approved |\n|-|-|-|-|\n\n';
 	}
 	const packageJustificationMdFileData = parsePackageJustificationMd(packageJustificationMdFileText);
+
+	// TODO: Update the MarkDown table
 	
 	await fs.writeFileAsync(path.join(process.cwd(), 'yarn.lock.json'), JSON.stringify(yarnLockFileData, null, 2));
 }
@@ -182,5 +184,54 @@ function parseYarnLock(text, packageJsonFileData) {
 }
 
 function parsePackageJustificationMd(text) {
+	const records = [];
+	let lastPrefixLineIndex;
+	let firstSuffixLineIndex;
 
+	let state = 'maybe-table-header';
+	const lines = text.split('\n');
+	for (let index = 0; index < lines.length; index++) {
+		const line = lines[index];
+		switch (state) {
+			case 'maybe-table-header': {
+				if (line.split('|').map(c => c.trim()).join('|') === '|Package|Kind|Justification|Approved|') {
+					state = 'table-header';
+					lastPrefixLineIndex = index;
+				}
+
+				break;
+			}
+
+			case 'table-header': {
+				if (line.split('|').map(c => c.trim().replace(/-/g, '')).join('|') === '|||||') {
+					state = 'table-row-or-terminator-blank-line';
+					break;
+				}
+
+				throw new Error(`Unexpected line ${line}. Expected line conforming to ${state}.`);
+			}
+
+			case 'table-row-or-terminator-blank-line': {
+				if (line.trim() === '') {
+					state = 'suffix-lines';
+					firstSuffixLineIndex = index;
+				} else {
+					const parts = line.split('|').map(c => c.trim());
+					const _package = parts[1];
+					const kind = parts[2];
+					const justification = parts[3];
+					const approved = parts[4];
+
+					records.push({ package: _package, kind, justification, approved });
+				}
+
+				break;
+			}
+		}
+	}
+
+	const prefix = lines.slice(0, lastPrefixLineIndex);
+	const suffix = lines.slice(firstSuffixLineIndex);
+
+	return { prefix, records, suffix };
 }
