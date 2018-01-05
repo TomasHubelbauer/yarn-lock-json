@@ -79,18 +79,31 @@ function parseYarnLock(text, packageJsonFileData) {
 
 			case '2nd-blank-line': {
 				if (line.trim() === '') {
-					state = 'package-name-and-version-string';
+					state = 'package-names-and-version-strings';
 					break;
 				}
 
 				throw new Error(`Unexpected line ${line}. Expected line conforming to ${state}.`);
 			}
 
-			case 'package-name-and-version-string': {
-				const parts = line.split('@');
-				const name = parts[0];
-				const versionString = parts[1].trim().slice(0, -1); // Remove `:`
-				packages.push({ name, versionString, dependencies: [], dependants: [] });
+			case 'package-names-and-version-strings': {
+				 // package@versionString1, package@versionString2, …
+				const parts = line.trim().slice(0, -1) /* Remove `:` */.split(',').map(part => {
+					part = part.trim();
+					if (part[0] === '"' && part[part.length - 1] === '"') {
+						part = part.slice(1, -1).replace(/ /g, ''); // Version strings with spaces in them.
+					}
+
+					return part.split('@');
+				});
+
+				if (!parts.every(part => part[0] === parts[0][0])) {
+					throw new Error(`Not all versions of ${parts[0][0]} share the name.`)
+				}
+
+				const name = parts[0][0];
+				const versionStrings = parts.map(part => part[1]); 
+				packages.push({ name, versionStrings, dependencies: [], dependants: [] });
 				state = 'package-version-line';
 				break;
 			}
@@ -121,7 +134,7 @@ function parseYarnLock(text, packageJsonFileData) {
 
 			case 'package-dependencies-line-or-terminator-blank-line': {
 				if (line.trim() === '') {
-					state = 'package-name-and-version-string';
+					state = 'package-names-and-version-strings';
 					break;
 				}
 
@@ -135,7 +148,7 @@ function parseYarnLock(text, packageJsonFileData) {
 
 			case 'package-dependency-line-or-terminator-blank-line': {
 				if (line.trim() === '') {
-					state = 'package-name-and-version-string';
+					state = 'package-names-and-version-strings';
 					break;
 				}
 
@@ -156,11 +169,11 @@ function parseYarnLock(text, packageJsonFileData) {
 	for (const _package of packages) {
 		for (const dependency of _package.dependencies) {
 			const _package2 = packages.find(p => p.name === dependency.name);
-			if (_package2) {
-				_package2.dependants.push(_package.name);
-			} else {
-				console.log(`Didn't find matching package ${dependency.name}, that's most likely because of unfinished parsing of the state 'package-name-and-version-string' which doesn't handle multiple values currently.`);
+			if (!_package2) {
+				throw new Error(`Cannot find package ${dependency.name}, a dependency of ${_package.name}.`);
 			}
+
+			_package2.dependants.push(_package.name);
 		}
 	}
 
