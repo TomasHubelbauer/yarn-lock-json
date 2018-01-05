@@ -4,16 +4,46 @@ import path from 'path';
 
 fs.readyFileAsync = util.promisify(fs.readFile);
 fs.writeFileAsync = util.promisify(fs.writeFile);
+fs.accessAsync = util.promisify(fs.access);
 
 async function run() {
-	const yarnLockFileText = String(await fs.readyFileAsync(path.join(process.cwd(), 'yarn.lock')));
-	const packageJsonFileData = JSON.parse(String(await fs.readyFileAsync(path.join(process.cwd(), 'package.json'))));
+	const currentWorkingDirectoryPath = process.cwd();
 
+	const yarnLockFilePath = path.join(currentWorkingDirectoryPath, 'yarn.lock');
+	const yarnLockFileText = String(await fs.readyFileAsync(yarnLockFilePath));
+	const yarnLockFileData = parseYarnLock(yarnLockFileText);
+
+	const packageJsonFilePath = path.join(currentWorkingDirectoryPath, 'package.json');
+	let packageJsonFileText;
+	try {
+		await fs.accessAsync(packageJsonFilePath);
+		packageJsonFileText = String(await fs.readyFileAsync(packageJsonFilePath));
+	} catch (error) {
+		packageJsonFileText = '{ "dependencies": [], "devDependencies": [] }';
+	}
+	const packageJsonFileData = JSON.parse(packageJsonFileText);
+
+	const packageJustificationMdFilePath = path.join(currentWorkingDirectoryPath, 'package-justification.md');
+	let packageJustificationMdFileText;
+	try {
+		await fs.accessAsync(packageJustificationMdFilePath);
+		packageJustificationMdFileText = String(await fs.readyFileAsync(packageJustificationMdFilePath));
+	} catch (error) {
+		packageJustificationMdFileText = '# Package Justification\n\n| Package | Kind | Justification | Approved |\n|-|-|-|-|\n\n';
+	}
+	const packageJustificationMdFileData = parsePackageJustificationMd(packageJustificationMdFileText);
+	
+	await fs.writeFileAsync(path.join(process.cwd(), 'yarn.lock.json'), JSON.stringify(yarnLockFileData, null, 2));
+}
+
+run();
+
+function parseYarnLock(text, packageJsonFileData) {
 	const packages = [];
 
 	// 1st pass generating the structure of the lock file
 	let state = 'auto-generated-comment';
-	const lines = yarnLockFileText.split('\n');
+	const lines = text.split('\n');
 	for (const line of lines) {
 		switch (state) {
 			case 'auto-generated-comment': {
@@ -147,8 +177,10 @@ async function run() {
 			console.log(`Found a package without dependants but not included in package.json: ${_package.name}.`);
 		}
 	}
-	
-	await fs.writeFileAsync(path.join(process.cwd(), 'yarn.lock.json'), JSON.stringify(packages, null, 2));
+
+	return packages;
 }
 
-run();
+function parsePackageJustificationMd(text) {
+
+}
