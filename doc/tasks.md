@@ -37,3 +37,7 @@ Consider also enabling a mode where the process errors only for unjustified dire
 | `react-addons-perf` | Indirect | A dependency of `react`. |                      |
 
 Rename the project to match this purpose.
+
+## Bundle as an NPM package and provide it under a good name like `yarn-justify`
+
+## Consider creating a post-install script in the NPM package that would automatically (or interactively) add a Git pre-commit hook
