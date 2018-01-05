@@ -15,8 +15,6 @@ Do this once mutating the justification MarkDown table is implemented.
 add Git name as approver and run the justification tool again to ensure constraints are met
 (justification isn't empty is the only constraint as this time).
 
-## Fix matching strings like `"setimmediate@>= 1.0.1", setimmediate@^1.0.5:`
-
 ## Fail table generation when justification is emptied but approval is checked
 
 Consider a mode where this only happens for top-level packages as opposed to all packages.
