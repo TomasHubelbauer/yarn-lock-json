@@ -2,6 +2,15 @@
 
 > Development plan
 
+## Consider reading `package.json` as well and distinguishing between dependencies and development dependencies
+
+Probably would have been two tables in `dependency-audit.md`.
+
+## Consider integrating with NPM package auditing tools
+
+- [npm-audit](https://www.npmjs.com/package/npm-audit)
+- [auditjs](https://www.npmjs.com/package/auditjs)
+
 ## Fix matching strings like `"setimmediate@>= 1.0.1", setimmediate@^1.0.5:`
 
 ## Upate a `.md` file with a table of dependencies and either keep reason or add a checkbox
