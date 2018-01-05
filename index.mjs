@@ -9,6 +9,7 @@ fs.accessAsync = util.promisify(fs.access);
 async function run() {
 	const currentWorkingDirectoryPath = process.cwd();
 
+	const yarnLockJsonFilePath = path.join(currentWorkingDirectoryPath, 'yarn.lock.json');
 	const yarnLockFilePath = path.join(currentWorkingDirectoryPath, 'yarn.lock');
 	const yarnLockFileText = String(await fs.readyFileAsync(yarnLockFilePath));
 	const yarnLockFileData = parseYarnLock(yarnLockFileText);
@@ -29,13 +30,14 @@ async function run() {
 		await fs.accessAsync(packageJustificationMdFilePath);
 		packageJustificationMdFileText = String(await fs.readyFileAsync(packageJustificationMdFilePath));
 	} catch (error) {
-		packageJustificationMdFileText = '# Package Justification\n\n| Package | Kind | Justification | Approved |\n|-|-|-|-|\n\n';
+		packageJustificationMdFileText = '# Package Justification\n\n|Package|Type|Justification|Approved|\n|-|-|-|-|\n';
 	}
 	const packageJustificationMdFileData = parsePackageJustificationMd(packageJustificationMdFileText);
 
-	// TODO: Update the MarkDown table
-	
-	await fs.writeFileAsync(path.join(process.cwd(), 'yarn.lock.json'), JSON.stringify(yarnLockFileData, null, 2));
+	packageJustificationMdFileText = makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData);
+
+	await fs.writeFileAsync(yarnLockJsonFilePath, JSON.stringify(yarnLockFileData, null, 2));
+	await fs.writeFileAsync(packageJustificationMdFilePath, packageJustificationMdFileText);
 }
 
 run();
@@ -164,17 +166,16 @@ function parseYarnLock(text, packageJsonFileData) {
 
 	// 3rd pass to mark packages as "dependency", "developmentDependency" or "" (for dependnecy of a dependency)
 	for (const _package of packages) {
-		// Dependency or a development dependnecy
 		if (_package.dependants.length > 0) {}
 		{
 			_package.type = '';
-			return;
+			continue;
 		}
 
 		if (Object.keys(packageJsonFileData.dependencies || {}).find(p => p === _package.name)) {
 			_package.type = 'dependency';
 		} else if (Object.keys(packageJsonFileData.devDependencies || {}).find(p => p === _package.name)) {
-			_package.type = 'dependency';
+			_package.type = 'development dependency';
 		} else {
 			console.log(`Found a package without dependants but not included in package.json: ${_package.name}.`);
 		}
@@ -194,7 +195,7 @@ function parsePackageJustificationMd(text) {
 		const line = lines[index];
 		switch (state) {
 			case 'maybe-table-header': {
-				if (line.split('|').map(c => c.trim()).join('|') === '|Package|Kind|Justification|Approved|') {
+				if (line.split('|').map(c => c.trim()).join('|') === '|Package|Type|Justification|Approved|') {
 					state = 'table-header';
 					lastPrefixLineIndex = index;
 				}
@@ -218,11 +219,12 @@ function parsePackageJustificationMd(text) {
 				} else {
 					const parts = line.split('|').map(c => c.trim());
 					const _package = parts[1];
-					const kind = parts[2];
+					const type = parts[2];
 					const justification = parts[3];
 					const approved = parts[4];
+					const isApproved = approved.trim().startsWith('[x]');
 
-					records.push({ package: _package, kind, justification, approved });
+					records.push({ package: _package, type, justification, approved, isApproved });
 				}
 
 				break;
@@ -230,8 +232,34 @@ function parsePackageJustificationMd(text) {
 		}
 	}
 
-	const prefix = lines.slice(0, lastPrefixLineIndex);
-	const suffix = lines.slice(firstSuffixLineIndex);
+	const prefix = lines.slice(0, lastPrefixLineIndex).join('\n');
+	const suffix = lines.slice(firstSuffixLineIndex).join('\n');
 
 	return { prefix, records, suffix };
+}
+
+// TODO: Calculate column size based on values in a pre-process.
+// TODO: Check for empty justifications in approved records!
+function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
+	const records = [];
+	for (let _package of yarnLockFileData) {
+		const recordIndex = packageJustificationMdFileData.records.findIndex(r => r.package === _package.name);
+		
+		let justification;
+		let approved;
+		if (recordIndex !== -1) {
+			const record = packageJustificationMdFileData.records[recordIndex];
+			justification = record.justification;
+			approved = record.approved;
+		} else {
+			justification = _package.dependants.length > 0 ? ('Dependency of ' + _package.dependants.join(', ')) : '';
+			approved = '[ ]';
+		}
+
+		records.push({ package: _package.name, type: _package.type, justification, approved });
+	}
+
+	const tableHead = '| Package | Type | Justification | Approved |\n|---|---|---|---|';
+	const tablebody = records.map(r => `| ${r.package} | ${r.type} | ${r.justification} | ${r.approved} |`).join('\n');
+	return `${packageJustificationMdFileData.prefix}\n${tableHead}\n${tablebody}\n${packageJustificationMdFileData.suffix}`;
 }

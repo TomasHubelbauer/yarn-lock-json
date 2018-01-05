@@ -17,22 +17,12 @@ add Git name as approver and run the justification tool again to ensure constrai
 
 ## Fix matching strings like `"setimmediate@>= 1.0.1", setimmediate@^1.0.5:`
 
-## Upate a `.md` file with a table of dependencies and either keep reason or add a checkbox
+## Fail table generation when justification is emptied but approval is checked
 
-The table is sorted alphabetically just like the lock file is.
-For top-level packages, justification is left blank, for dependencies, it says who depends on it.
-The justification is either generated on first run or left untouched when updating the MarkDown file.
-If justification is empty but the checkbox is checked, the process fails - need to provide justification
-or accept the generated one when approving packages.
-Consider also enabling a mode where the process errors only for unjustified direct packages.
-(This is looser but doesn't encourage studying dependencies of your dependencies.)
+Consider a mode where this only happens for top-level packages as opposed to all packages.
+The latter is the default as it encourages proper dependency review.
 
-| Package             | Kind     | Justification            | Approved             |
-|---------------------|----------|--------------------------|----------------------|
-| `react`             | Direct   | UI framework             | [x] Tomas Hubelbauer |
-| `react-addons-perf` | Indirect | A dependency of `react`. |                      |
-
-Rename the project to match this purpose.
+## Rename project to signal this is about package justification first and forefront
 
 ## Bundle as an NPM package and provide it under a good name like `yarn-justify`
 
