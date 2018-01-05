@@ -30,7 +30,7 @@ async function run() {
 		await fs.accessAsync(packageJustificationMdFilePath);
 		packageJustificationMdFileText = String(await fs.readyFileAsync(packageJustificationMdFilePath));
 	} catch (error) {
-		packageJustificationMdFileText = '# Package Justification\n\n|Package|Type|Justification|Approved|\n|-|-|-|-|\n';
+		packageJustificationMdFileText = '# Package Justification\n\n|Package|Version Strings|Type|Justification|Approved|\n|-|-|-|-|-|\n';
 	}
 	const packageJustificationMdFileData = parsePackageJustificationMd(packageJustificationMdFileText);
 
@@ -208,7 +208,7 @@ function parsePackageJustificationMd(text) {
 		const line = lines[index];
 		switch (state) {
 			case 'maybe-table-header': {
-				if (line.split('|').map(c => c.trim()).join('|') === '|Package|Type|Justification|Approved|') {
+				if (line.split('|').map(c => c.trim()).join('|') === '|Package|Version Strings|Type|Justification|Approved|') {
 					state = 'table-header';
 					lastPrefixLineIndex = index;
 				}
@@ -217,7 +217,7 @@ function parsePackageJustificationMd(text) {
 			}
 
 			case 'table-header': {
-				if (line.split('|').map(c => c.trim().replace(/-/g, '')).join('|') === '|||||') {
+				if (line.split('|').map(c => c.trim().replace(/-/g, '')).join('|') === '||||||') {
 					state = 'table-row-or-terminator-blank-line';
 					break;
 				}
@@ -232,9 +232,10 @@ function parsePackageJustificationMd(text) {
 				} else {
 					const parts = line.split('|').map(c => c.trim());
 					const _package = parts[1];
-					const type = parts[2];
-					const justification = parts[3];
-					const approved = parts[4];
+					const versionStrings = parts[2];
+					const type = parts[3];
+					const justification = parts[4];
+					const approved = parts[5];
 					const isApproved = approved.trim().startsWith('[x]');
 
 					records.push({ package: _package, type, justification, approved, isApproved });
@@ -253,10 +254,26 @@ function parsePackageJustificationMd(text) {
 
 // TODO: Check for empty justifications in approved records!
 function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
+	// Compute longest lenths in order to be able to pad columns to a consistent width.
+	let longestPackageLength = 'Package'.length;
+	let longestVersionStringsLength = 'Version Strings'.length;
+	let longestTypeLength = 'Type'.length;
+	let longestJustificationLength = 'Justification'.length;
+	let longestApprovedLength = 'Approved'.length;
+	
 	const records = [];
 	for (let _package of yarnLockFileData) {
 		const recordIndex = packageJustificationMdFileData.records.findIndex(r => r.package === _package.name);
 		
+		const packageName = _package.name;
+		if (packageName.length > longestPackageLength) longestPackageLength = packageName.length;
+
+		const versionStrings = _package.versionStrings.join(', ');
+		if (versionStrings.length > longestVersionStringsLength) longestVersionStringsLength = versionStrings.length;
+
+		const type = _package.type;
+		if (type.length > longestTypeLength) longestTypeLength = type.length;
+
 		let justification;
 		let approved;
 		if (recordIndex !== -1) {
@@ -268,21 +285,21 @@ function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 			approved = '[ ]';
 		}
 
-		records.push({ package: _package.name, type: _package.type, justification, approved });
-	}
+		if (justification.length > longestJustificationLength) longestJustificationLength = justification.length;
+		if (approved.length > longestApprovedLength) longestApprovedLength = approved.length;
 
-	const longestPackageLength = records.map(r => r.package).concat([ 'Package' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
-	const longestTypeLength = records.map(r => r.type).concat([ 'Type' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
-	const longestJustificationLength = records.map(r => r.justification).concat([ 'Justification' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
-	const longestApprovedLength = records.map(r => r.approved).concat([ 'Approved' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
+		records.push({ package: packageName, versionStrings, type, justification, approved });
+	}
 
 	const tableHead = '|'
 		+ ` ${spaceRightTo('Package', longestPackageLength)} |`
+		+ ` ${spaceRightTo('Version Strings', longestVersionStringsLength)} |`
 		+ ` ${spaceRightTo('Type', longestTypeLength)} |`
 		+ ` ${spaceRightTo('Justification', longestJustificationLength)} |`
 		+ ` ${spaceRightTo('Approved', longestApprovedLength)} |`
 		+ `\n|`
 		+ `${'-'.repeat(longestPackageLength + 2)}|`
+		+ `${'-'.repeat(longestVersionStringsLength + 2)}|`
 		+ `${'-'.repeat(longestTypeLength + 2)}|`
 		+ `${'-'.repeat(longestJustificationLength + 2)}|`
 		+ `${'-'.repeat(longestApprovedLength + 2)}|`;
@@ -290,6 +307,7 @@ function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 	const tablebody = records
 		.map(r => '|'
 			+ ` ${spaceRightTo(r.package, longestPackageLength)} |`
+			+ ` ${spaceRightTo(r.versionStrings, longestVersionStringsLength)} |`
 			+ ` ${spaceRightTo(r.type, longestTypeLength)} |`
 			+ ` ${spaceRightTo(r.justification, longestJustificationLength)} |`
 			+ ` ${spaceRightTo(r.approved, longestApprovedLength)} |`)

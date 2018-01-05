@@ -22,8 +22,8 @@ The latter is the default as it encourages proper dependency review.
 
 ## Rename project to signal this is about package justification first and forefront
 
-## Bundle as an NPM package and provide it under a good name like `yarn-justify`
+## Bundle as a binary NPM package and provide it under a good name like `yarn-justify`
 
 ## Consider creating a post-install script in the NPM package that would automatically (or interactively) add a Git pre-commit hook
 
-## Display gathered version strings in the justification table
+## Figure out why `type` is empty
