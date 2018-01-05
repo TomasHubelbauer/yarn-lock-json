@@ -7,6 +7,7 @@ fs.writeFileAsync = util.promisify(fs.writeFile);
 
 async function run() {
 	const yarnLockFileText = String(await fs.readyFileAsync(path.join(process.cwd(), 'yarn.lock')));
+	const packageJsonFileData = JSON.parse(String(await fs.readyFileAsync(path.join(process.cwd(), 'package.json'))));
 
 	const packages = [];
 
@@ -126,6 +127,24 @@ async function run() {
 			} else {
 				console.log(`Didn't find matching package ${dependency.name}, that's most likely because of unfinished parsing of the state 'package-name-and-version-string' which doesn't handle multiple values currently.`);
 			}
+		}
+	}
+
+	// 3rd pass to mark packages as "dependency", "developmentDependency" or "" (for dependnecy of a dependency)
+	for (const _package of packages) {
+		// Dependency or a development dependnecy
+		if (_package.dependants.length > 0) {}
+		{
+			_package.type = '';
+			return;
+		}
+
+		if (Object.keys(packageJsonFileData.dependencies || {}).find(p => p === _package.name)) {
+			_package.type = 'dependency';
+		} else if (Object.keys(packageJsonFileData.devDependencies || {}).find(p => p === _package.name)) {
+			_package.type = 'dependency';
+		} else {
+			console.log(`Found a package without dependants but not included in package.json: ${_package.name}.`);
 		}
 	}
 	

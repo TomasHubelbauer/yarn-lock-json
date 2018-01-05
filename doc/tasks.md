@@ -2,10 +2,6 @@
 
 > Development plan
 
-## Consider reading `package.json` as well and distinguishing between dependencies and development dependencies
-
-Probably would have been two tables in `dependency-audit.md`.
-
 ## Consider integrating with NPM package auditing tools
 
 - [npm-audit](https://www.npmjs.com/package/npm-audit)
