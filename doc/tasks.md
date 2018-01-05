@@ -2,7 +2,7 @@
 
 > Development plan
 
-## Generate `dependants` field for each package as a reverse for `dependencies`
+## Fix matching strings like `"setimmediate@>= 1.0.1", setimmediate@^1.0.5:`
 
 ## Upate a `.md` file with a table of dependencies and either keep reason or add a checkbox
 
@@ -11,10 +11,12 @@ For top-level packages, justification is left blank, for dependencies, it says w
 The justification is either generated on first run or left untouched when updating the MarkDown file.
 If justification is empty but the checkbox is checked, the process fails - need to provide justification
 or accept the generated one when approving packages.
+Consider also enabling a mode where the process errors only for unjustified direct packages.
+(This is looser but doesn't encourage studying dependencies of your dependencies.)
 
-| Package             | Justification            | Approved             |
-|---------------------|--------------------------|----------------------|
-| `react`             | UI framework             | [x] Tomas Hubelbauer |
-| `react-addons-perf` | A dependency of `react`. |                      |
+| Package             | Kind     | Justification            | Approved             |
+|---------------------|----------|--------------------------|----------------------|
+| `react`             | Direct   | UI framework             | [x] Tomas Hubelbauer |
+| `react-addons-perf` | Indirect | A dependency of `react`. |                      |
 
 Rename the project to match this purpose.
