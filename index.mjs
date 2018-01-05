@@ -9,11 +9,6 @@ fs.accessAsync = util.promisify(fs.access);
 async function run() {
 	const currentWorkingDirectoryPath = process.cwd();
 
-	const yarnLockJsonFilePath = path.join(currentWorkingDirectoryPath, 'yarn.lock.json');
-	const yarnLockFilePath = path.join(currentWorkingDirectoryPath, 'yarn.lock');
-	const yarnLockFileText = String(await fs.readyFileAsync(yarnLockFilePath));
-	const yarnLockFileData = parseYarnLock(yarnLockFileText);
-
 	const packageJsonFilePath = path.join(currentWorkingDirectoryPath, 'package.json');
 	let packageJsonFileText;
 	try {
@@ -33,6 +28,11 @@ async function run() {
 		packageJustificationMdFileText = '# Package Justification\n\n|Package|Version Strings|Type|Justification|Approved|\n|-|-|-|-|-|\n';
 	}
 	const packageJustificationMdFileData = parsePackageJustificationMd(packageJustificationMdFileText);
+
+	const yarnLockJsonFilePath = path.join(currentWorkingDirectoryPath, 'yarn.lock.json');
+	const yarnLockFilePath = path.join(currentWorkingDirectoryPath, 'yarn.lock');
+	const yarnLockFileText = String(await fs.readyFileAsync(yarnLockFilePath));
+	const yarnLockFileData = parseYarnLock(yarnLockFileText, packageJsonFileData);
 
 	packageJustificationMdFileText = makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData);
 
@@ -179,7 +179,7 @@ function parseYarnLock(text, packageJsonFileData) {
 
 	// 3rd pass to mark packages as "dependency", "developmentDependency" or "" (for dependnecy of a dependency)
 	for (const _package of packages) {
-		if (_package.dependants.length > 0) {}
+		if (_package.dependants.length > 0)
 		{
 			_package.type = '';
 			continue;
@@ -190,6 +190,7 @@ function parseYarnLock(text, packageJsonFileData) {
 		} else if (Object.keys(packageJsonFileData.devDependencies || {}).find(p => p === _package.name)) {
 			_package.type = 'development dependency';
 		} else {
+			_package.type = 'unknown';
 			console.log(`Found a package without dependants but not included in package.json: ${_package.name}.`);
 		}
 	}

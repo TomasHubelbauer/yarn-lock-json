@@ -9,8 +9,6 @@
 
 ## Consider providing a `justify` command for Yarn
 
-Do this once mutating the justification MarkDown table is implemented.
-
 `yarn run justify react "UI framework"` would add justification to the table, check the checkbox,
 add Git name as approver and run the justification tool again to ensure constraints are met
 (justification isn't empty is the only constraint as this time).
@@ -25,5 +23,3 @@ The latter is the default as it encourages proper dependency review.
 ## Bundle as a binary NPM package and provide it under a good name like `yarn-justify`
 
 ## Consider creating a post-install script in the NPM package that would automatically (or interactively) add a Git pre-commit hook
-
-## Figure out why `type` is empty
