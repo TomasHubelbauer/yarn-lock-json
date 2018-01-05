@@ -2,13 +2,20 @@
 
 > Generate a JSON object representing your `yarn.lock`.
 
+A script (recommended to run as a pre-commit hook) which updates a `package-justifications.md` file with a list
+of justifications for including the package to always include all packages used at any one time.
+
+Justifications are synchronized with the package list and need to be explicitly approved otherwise the script
+fails with an error in case there is an unjustified (top-level or any) dependency.
+
 **Features:**
 
 - Generating a JSON representation of a `yarn.lock` lock file
 - Generating a `dependants` field for a full story of the dependency graph
-- ([In development](doc/tasks.md)) Generating a `dependency-audit.md` file with justification and approval for:
-  - Top-level packages only - the ones added through `yarn add`
-  - All packages - encouraging studying dependencies or your dependencies
+- Generating a `package-justifications.md` file with justification and approval for dependencies
+- ([In development](doc/tasks.md)) Switching between requiring justifications for all or only top-level packages
+- ([In development](doc/tasks.md)) Integration with auditing tools for reporting insecure packages
+- ([In development](doc/tasks.md)) Automatic installation of the pre-commit Git hook after installation
 
 ## Running
 
