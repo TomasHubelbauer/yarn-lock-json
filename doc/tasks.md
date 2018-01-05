@@ -11,6 +11,14 @@ Probably would have been two tables in `dependency-audit.md`.
 - [npm-audit](https://www.npmjs.com/package/npm-audit)
 - [auditjs](https://www.npmjs.com/package/auditjs)
 
+## Consider providing a `justify` command for Yarn
+
+Do this once mutating the justification MarkDown table is implemented.
+
+`yarn run justify react "UI framework"` would add justification to the table, check the checkbox,
+add Git name as approver and run the justification tool again to ensure constraints are met
+(justification isn't empty is the only constraint as this time).
+
 ## Fix matching strings like `"setimmediate@>= 1.0.1", setimmediate@^1.0.5:`
 
 ## Upate a `.md` file with a table of dependencies and either keep reason or add a checkbox
