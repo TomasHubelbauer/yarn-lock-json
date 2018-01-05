@@ -238,7 +238,6 @@ function parsePackageJustificationMd(text) {
 	return { prefix, records, suffix };
 }
 
-// TODO: Calculate column size based on values in a pre-process.
 // TODO: Check for empty justifications in approved records!
 function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 	const records = [];
