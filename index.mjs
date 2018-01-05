@@ -259,7 +259,37 @@ function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 		records.push({ package: _package.name, type: _package.type, justification, approved });
 	}
 
-	const tableHead = '| Package | Type | Justification | Approved |\n|---|---|---|---|';
-	const tablebody = records.map(r => `| ${r.package} | ${r.type} | ${r.justification} | ${r.approved} |`).join('\n');
+	const longestPackageLength = records.map(r => r.package).concat([ 'Package' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
+	const longestTypeLength = records.map(r => r.type).concat([ 'Type' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
+	const longestJustificationLength = records.map(r => r.justification).concat([ 'Justification' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
+	const longestApprovedLength = records.map(r => r.approved).concat([ 'Approved' ]).reduce((a, c) => c.length > a ? c.length : a, 0);
+
+	const tableHead = '|'
+		+ ` ${spaceRightTo('Package', longestPackageLength)} |`
+		+ ` ${spaceRightTo('Type', longestTypeLength)} |`
+		+ ` ${spaceRightTo('Justification', longestJustificationLength)} |`
+		+ ` ${spaceRightTo('Approved', longestApprovedLength)} |`
+		+ `\n|`
+		+ `${'-'.repeat(longestPackageLength + 2)}|`
+		+ `${'-'.repeat(longestTypeLength + 2)}|`
+		+ `${'-'.repeat(longestJustificationLength + 2)}|`
+		+ `${'-'.repeat(longestApprovedLength + 2)}|`;
+
+	const tablebody = records
+		.map(r => '|'
+			+ ` ${spaceRightTo(r.package, longestPackageLength)} |`
+			+ ` ${spaceRightTo(r.type, longestTypeLength)} |`
+			+ ` ${spaceRightTo(r.justification, longestJustificationLength)} |`
+			+ ` ${spaceRightTo(r.approved, longestApprovedLength)} |`)
+		.join('\n');
+
 	return `${packageJustificationMdFileData.prefix}\n${tableHead}\n${tablebody}\n${packageJustificationMdFileData.suffix}`;
+}
+
+function spaceRightTo(text, length) {
+	if (length > text.length) {
+		return text + ' '.repeat(length - text.length);
+	}
+	
+	return text;
 }
