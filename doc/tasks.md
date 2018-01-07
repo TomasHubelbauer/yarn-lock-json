@@ -2,15 +2,11 @@
 
 > Development plan
 
-## Release `yarn-justify` to NPMJS.org
-
-- `yarn-justify` to check for justifications and update the justification table
-- `yarn-justify --top-level-only` to check only top-level packages and update the justification table
-- `yarn-justify react "UI framework"` to approve with justification through the CLI
-
-## See if there is a way to contribute a `package.json` script for `scripts` after installation
+## See if there is a way good to contribute a `yarn run justify` script in `postinstall`
 
 This way we could make `yarn justify` do `yarn-justify`.
+Doable by invoking a shell script for sure, but would be nice if there was a supported
+way for this.
 
 ## Support NPM lock file
 
@@ -27,3 +23,22 @@ Find who added the `[x]` without adding justification.
 
 Each version should have its own records and new versions should maybe be considered
 approved automatically unless they are breaking versions.
+
+## Fix `echo "yarn-justify" >> .git/hooks/pre-commit` not working after installation
+
+Is the current working directory correct?
+
+Also:
+
+## Think about local versus global installation and how it affects hook installation
+
+When installing locally, it is okay to install the Git pre-commit hook, but when
+installing globally, it makes no sense as we're not in context of a Git repository.
+
+Can we tell the two instances apart? Should we just check for .git and if present,
+then install the hook?
+
+## Introduce tests
+
+The tests should test just the script itself as well as installation from NPMJS.org
+and working in a temporary directory Git repository.

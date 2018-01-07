@@ -90,6 +90,21 @@ The same goes for `package-justification.md` where only actually utilized packag
 
 See [development plan](doc/tasks.md).
 
+## Testing
+
+There is no machine testing at the moment.
+
+To test the package manually, create a new Git repository and set up an NPM project with some packages:
+
+```sh
+git init
+yarn init -y
+yarn add react redux
+npm install yarn-justify
+# Optionally add a `yarn run justify` script
+yarn-justify
+```
+
 ## Studying
 
 See [development log](doc/notes.md).
