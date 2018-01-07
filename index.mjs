@@ -6,6 +6,8 @@ fs.readyFileAsync = util.promisify(fs.readFile);
 fs.writeFileAsync = util.promisify(fs.writeFile);
 fs.accessAsync = util.promisify(fs.access);
 
+const onlyTopLevel = false;
+
 async function run() {
 	const currentWorkingDirectoryPath = process.cwd();
 
@@ -237,7 +239,7 @@ function parsePackageJustificationMd(text) {
 					const type = parts[3];
 					const justification = parts[4];
 					const approved = parts[5];
-					const isApproved = approved.trim().startsWith('[x]');
+					const isApproved = approved.trim().startsWith('[x]') || approved.trim().startsWith('[X]');
 
 					records.push({ package: _package, type, justification, approved, isApproved });
 				}
@@ -263,6 +265,7 @@ function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 	let longestApprovedLength = 'Approved'.length;
 	
 	const records = [];
+	const breaches = [];
 	for (let _package of yarnLockFileData) {
 		const recordIndex = packageJustificationMdFileData.records.findIndex(r => r.package === _package.name);
 		
@@ -281,6 +284,12 @@ function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 			const record = packageJustificationMdFileData.records[recordIndex];
 			justification = record.justification;
 			approved = record.approved;
+
+			if (record.isApproved && !record.justification) {
+				if (!onlyTopLevel || (record.type === 'dependency' || record.type === 'development dependency')) {
+					breaches.push(_package.name);
+				}
+			}
 		} else {
 			justification = _package.dependants.length > 0 ? ('Dependency of ' + _package.dependants.join(', ')) : '';
 			approved = '[ ]';
@@ -290,6 +299,10 @@ function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 		if (approved.length > longestApprovedLength) longestApprovedLength = approved.length;
 
 		records.push({ package: packageName, versionStrings, type, justification, approved });
+	}
+
+	if (breaches.length > 0) {
+		throw new Error(`The following approved packages miss justification:\n${breaches.join('\n')}`);
 	}
 
 	const tableHead = '|'
