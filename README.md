@@ -80,6 +80,8 @@ The same can be done manually if so desired.
 
 ## Contributing
 
+See [development plan](doc/tasks.md).
+
 This script itself doesn't use any dependencies for its function, so running the tool
 on itself will produce an empty result.
 
@@ -88,7 +90,8 @@ with packages with packages unless they are actualliy utilized for the contribut
 
 The same goes for `package-justification.md` where only actually utilized packages should be commited, too.
 
-See [development plan](doc/tasks.md).
+If you are having trouble with `npm publish` and NodeJS 9.3.0, use `nvm` to switch to `8.7.0` temporarily.
+(A note to self as I'm the only one publishing the repository…)
 
 ## Testing
 
