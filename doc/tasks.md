@@ -2,24 +2,33 @@
 
 > Development plan
 
-## Consider integrating with NPM package auditing tools
+## Integrate with NPM package auditing tools
 
 - [npm-audit](https://www.npmjs.com/package/npm-audit)
 - [auditjs](https://www.npmjs.com/package/auditjs)
 
-## Consider providing a `justify` command for Yarn
+## Package the tool for NPMJS.org
 
-`yarn run justify react "UI framework"` would add justification to the table, check the checkbox,
-add Git name as approver and run the justification tool again to ensure constraints are met
-(justification isn't empty is the only constraint as this time).
+- Rename project to `yarn-justify`
+- Use the `bin` field in `package.json` in order to make the package executable
+- Accept `--only-top-level` CLI switch
+- Use `postinstall` script in order to use `npm-hooks` package to install a `pre-commit` hook running self
 
-## Fail table generation when justification is emptied but approval is checked
+Usage:
 
-Consider a mode where this only happens for top-level packages as opposed to all packages.
-The latter is the default as it encourages proper dependency review.
+- `yarn-justify` to check for justifications and update the justification table
+- `yarn-justify --top-level-only` to check only top-level packages and update the justification table
+- `yarn-justify react "UI framework"` to approve with justification through the CLI
 
-## Rename project to signal this is about package justification first and forefront
+## See if there is a way to contribute a `package.json` script for `scripts` after installation
 
-## Bundle as a binary NPM package and provide it under a good name like `yarn-justify`
+This way we could make `yarn justify` do `yarn-justify`.
 
-## Consider creating a post-install script in the NPM package that would automatically (or interactively) add a Git pre-commit hook
+## Extend to support NPM
+
+- Read NPM shrinkwrap file
+- Rename project to `package-justify` and note that both Yarn and NPM is supported
+
+## Use `git blame` when reporting which packages miss justification
+
+Find who added the `[x]` without adding justification.
