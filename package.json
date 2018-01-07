@@ -1,10 +1,12 @@
 {
   "name": "yarn-lock-file-test",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.mjs",
+  "bin": "index.mjs",
   "license": "MIT",
   "scripts": {
-    "start": "node --experimental-modules index.mjs"
+    "start": "node --experimental-modules index.mjs",
+    "postinstall": "echo 'yarn-justify' >> .git/hooks/pre-commit"
   },
   "dependencies": {}
 }
