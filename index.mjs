@@ -6,7 +6,7 @@ fs.readyFileAsync = util.promisify(fs.readFile);
 fs.writeFileAsync = util.promisify(fs.writeFile);
 fs.accessAsync = util.promisify(fs.access);
 
-const onlyTopLevel = false;
+const tolLevelOnly = process.argv[2] === '--top-level-only';
 
 async function run() {
 	const currentWorkingDirectoryPath = process.cwd();
@@ -283,7 +283,7 @@ function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 			approved = record.approved;
 
 			if (record.isApproved && !record.justification) {
-				if (!onlyTopLevel || (record.type === 'dependency' || record.type === 'development dependency')) {
+				if (!tolLevelOnly || (record.type === 'dependency' || record.type === 'development dependency')) {
 					breaches.push(_package.name);
 				}
 			}
