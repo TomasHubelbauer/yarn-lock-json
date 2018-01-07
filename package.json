@@ -1,5 +1,5 @@
 {
-  "name": "yarn-lock-file-test",
+  "name": "yarn-justify",
   "version": "1.0.0",
   "main": "index.mjs",
   "bin": "index.mjs",
