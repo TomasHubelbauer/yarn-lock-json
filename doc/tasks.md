@@ -42,3 +42,5 @@ then install the hook?
 
 The tests should test just the script itself as well as installation from NPMJS.org
 and working in a temporary directory Git repository.
+
+## Utilize GitHub releases
