@@ -255,7 +255,6 @@ function parsePackageJustificationMd(text) {
 	return { prefix, records, suffix };
 }
 
-// TODO: Check for empty justifications in approved records!
 function makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData) {
 	// Compute longest lenths in order to be able to pad columns to a consistent width.
 	let longestPackageLength = 'Package'.length;
