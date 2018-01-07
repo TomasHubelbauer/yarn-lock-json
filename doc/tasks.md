@@ -2,14 +2,8 @@
 
 > Development plan
 
-## Integrate with NPM package auditing tools
-
-- [npm-audit](https://www.npmjs.com/package/npm-audit)
-- [auditjs](https://www.npmjs.com/package/auditjs)
-
 ## Package the tool for NPMJS.org
 
-- Rename project to `yarn-justify`
 - Use the `bin` field in `package.json` in order to make the package executable
 - Accept `--only-top-level` CLI switch
 - Use `postinstall` script in order to use `npm-hooks` package to install a `pre-commit` hook running self

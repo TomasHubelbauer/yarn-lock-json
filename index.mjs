@@ -36,10 +36,8 @@ async function run() {
 	const yarnLockFileText = String(await fs.readyFileAsync(yarnLockFilePath));
 	const yarnLockFileData = parseYarnLock(yarnLockFileText, packageJsonFileData);
 
-	packageJustificationMdFileText = makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData);
-
-	await fs.writeFileAsync(yarnLockJsonFilePath, JSON.stringify(yarnLockFileData, null, 2));
-	await fs.writeFileAsync(packageJustificationMdFilePath, packageJustificationMdFileText);
+	await fs.writeFileAsync(packageJustificationMdFilePath,
+		makeUpdatedTable(yarnLockFileData, packageJustificationMdFileData));
 }
 
 run();
