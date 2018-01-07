@@ -2,13 +2,7 @@
 
 > Development plan
 
-## Package the tool for NPMJS.org
-
-- Use the `bin` field in `package.json` in order to make the package executable
-- Accept `--only-top-level` CLI switch
-- Use `postinstall` script in order to use `npm-hooks` package to install a `pre-commit` hook running self
-
-Usage:
+## Release `yarn-justify` to NPMJS.org
 
 - `yarn-justify` to check for justifications and update the justification table
 - `yarn-justify --top-level-only` to check only top-level packages and update the justification table
@@ -18,7 +12,7 @@ Usage:
 
 This way we could make `yarn justify` do `yarn-justify`.
 
-## Extend to support NPM
+## Support NPM lock file
 
 - Read NPM shrinkwrap file
 - Rename project to `package-justify` and note that both Yarn and NPM is supported
@@ -26,3 +20,10 @@ This way we could make `yarn justify` do `yarn-justify`.
 ## Use `git blame` when reporting which packages miss justification
 
 Find who added the `[x]` without adding justification.
+
+## Fix warning with empty lock file
+
+## Support versions granually and think through new version defaults
+
+Each version should have its own records and new versions should maybe be considered
+approved automatically unless they are breaking versions.

@@ -42,7 +42,7 @@ Optionally you can add a `justify` script `package.json`:
   // …
   "scripts": {
     // …
-    "justify": "yarn-justify [--top-level-only]",
+    "justify": "yarn-justify",
     // …
   },
   // …
@@ -50,11 +50,33 @@ Optionally you can add a `justify` script `package.json`:
 
 You can run this script using `yarn justify` or update the pre-commit hook to run it.
 
+See [Using](#using) for more information about CLI usage.
+
 **As a contributor:**
 
 `yarn start`
 
 See [Contributing](#contributing) for more information.
+
+## Using
+
+[NPM lock file support is coming](doc/tasks.md)
+
+**`yarn-justify`**
+
+Synchronizes dependencies from the `yarn.lock`, reports all approved-but-unjustified dependencies,
+updates `package-justification.md` if none.
+
+**`yarn-justify --top-level-only`**
+
+Synchronizes dependencies from the `yarn.lock`, reports all approved-but-unjustified dependencies
+(only those mentioned in `dependencies` and `devDependencies` in `package.json`, not indirect ones),
+updates `package-justification.md` if none.
+
+**`yarn-justify $package "$reason"`**
+
+Updates the *Justification* cell in `package-justification.md` and [x] approves the package.
+The same can be done manually if so desired.
 
 ## Contributing
 
@@ -63,6 +85,8 @@ on itself will produce an empty result.
 
 Feel free to temporarily add packages during development, but do not commit `package.json`
 with packages with packages unless they are actualliy utilized for the contribution's function.
+
+The same goes for `package-justification.md` where only actually utilized packages should be commited, too.
 
 See [development plan](doc/tasks.md).
 
