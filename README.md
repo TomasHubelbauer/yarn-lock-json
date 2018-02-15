@@ -1,5 +1,7 @@
 # Yarn Justify
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/TomasHubelbauer/yarn-justify.svg)](https://greenkeeper.io/)
+
 > A CLI tool for checking and reporting justification of inclusion of NodeJS packages based on Yarn lock file
 
 A script (recommended to run as a pre-commit hook) which updates a `package-justifications.md` file with a list
