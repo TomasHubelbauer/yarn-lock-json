@@ -21,9 +21,6 @@ fails with an error in case there is an unjustified dependency (top-level or any
 
 `yarn add yarn-justify`
 
-We recommend you accompany Yarn Justify with [`auditjs`](https://www.npmjs.com/package/auditjs)
-in order to be able to make a more informed decision when justifying inclusion of NPM packages.
-
 **Support:**
 
 At this time only Yarn is supported and lock file version 1 (latest) is required.
@@ -49,6 +46,8 @@ Optionally you can add a `justify` script `package.json`:
 ```
 
 You can run this script using `yarn justify` or update the pre-commit hook to run it.
+
+It might also be helpful to run `yarn audit` while justifying a package to catch any vulnerabilities.
 
 See [Using](#using) for more information about CLI usage.
 
