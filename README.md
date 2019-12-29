@@ -79,13 +79,11 @@ The same can be done manually if so desired.
 
 ## Contributing
 
-See [development plan](doc/tasks.md).
-
 This script itself doesn't use any dependencies for its function, so running the tool
 on itself will produce an empty result.
 
 Feel free to temporarily add packages during development, but do not commit `package.json`
-with packages with packages unless they are actualliy utilized for the contribution's function.
+with packages unless they are actualliy utilized for the contribution's function.
 
 The same goes for `package-justification.md` where only actually utilized packages should be commited, too.
 
