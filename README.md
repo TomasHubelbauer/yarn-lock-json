@@ -105,10 +105,6 @@ npm install yarn-justify
 yarn-justify
 ```
 
-## Studying
-
-See [development log](doc/notes.md).
-
 ## To-Do
 
 ### See if there is a way good to contribute a `yarn run justify` script in `postinstall`
